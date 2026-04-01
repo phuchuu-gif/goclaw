@@ -104,6 +104,7 @@ func seedConfigForContext(ctx context.Context, sc store.SystemConfigStore, cfg *
 	setInt("gateway.inbound_debounce_ms", cfg.Gateway.InboundDebounceMs)
 	setBool("gateway.block_reply", cfg.Gateway.BlockReply)
 	setBool("gateway.tool_status", cfg.Gateway.ToolStatus)
+	setBool("gateway.auto_title", cfg.Gateway.AutoTitle)
 	setInt("gateway.task_recovery_interval_sec", cfg.Gateway.TaskRecoveryIntervalSec)
 
 	// Tools

@@ -25,13 +25,14 @@ import (
 type ChatMethods struct {
 	agents         *agent.Router
 	sessions       store.SessionStore
+	cfg            *config.Config
 	rateLimiter    *gateway.RateLimiter
 	eventBus       bus.EventPublisher
 	postTurn tools.PostTurnProcessor
 }
 
-func NewChatMethods(agents *agent.Router, sess store.SessionStore, rl *gateway.RateLimiter, eventBus bus.EventPublisher) *ChatMethods {
-	return &ChatMethods{agents: agents, sessions: sess, rateLimiter: rl, eventBus: eventBus}
+func NewChatMethods(agents *agent.Router, sess store.SessionStore, cfg *config.Config, rl *gateway.RateLimiter, eventBus bus.EventPublisher) *ChatMethods {
+	return &ChatMethods{agents: agents, sessions: sess, cfg: cfg, rateLimiter: rl, eventBus: eventBus}
 }
 
 // SetPostTurnProcessor sets the post-turn processor for team task dispatch.
@@ -260,7 +261,7 @@ func (m *ChatMethods) handleSend(ctx context.Context, client *gateway.Client, re
 		}
 
 		// Auto-generate conversation title on first message (label empty = never titled).
-		if label := m.sessions.GetLabel(ctx, sessionKey); label == "" {
+		if (m.cfg.Gateway.AutoTitle == nil || *m.cfg.Gateway.AutoTitle) && m.sessions.GetLabel(ctx, sessionKey) == "" {
 			agentProvider := loop.Provider()
 			agentModel := loop.Model()
 			userMsg := params.Message

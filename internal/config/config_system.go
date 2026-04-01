@@ -50,6 +50,7 @@ func (c *Config) ApplySystemConfigs(configs map[string]string) {
 	integer("gateway.inbound_debounce_ms", &c.Gateway.InboundDebounceMs)
 	boolean("gateway.block_reply", &c.Gateway.BlockReply)
 	boolean("gateway.tool_status", &c.Gateway.ToolStatus)
+	boolean("gateway.auto_title", &c.Gateway.AutoTitle)
 	integer("gateway.task_recovery_interval_sec", &c.Gateway.TaskRecoveryIntervalSec)
 
 	// Tools

@@ -348,6 +348,7 @@ type GatewayConfig struct {
 	Quota             *QuotaConfig `json:"quota,omitempty"`               // per-user/group request quotas
 	BlockReply              *bool        `json:"block_reply,omitempty"`                // deliver intermediate text during tool iterations (default false)
 	ToolStatus              *bool        `json:"tool_status,omitempty"`                // show tool name in streaming preview during tool execution (default true)
+	AutoTitle               *bool        `json:"auto_title,omitempty"`                 // automatically generate session title (default true)
 	TaskRecoveryIntervalSec int          `json:"task_recovery_interval_sec,omitempty"` // team task recovery ticker interval in seconds (default 300 = 5min)
 }
 

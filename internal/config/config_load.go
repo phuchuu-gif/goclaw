@@ -180,6 +180,10 @@ func (c *Config) applyEnvOverrides() {
 			c.Gateway.Port = port
 		}
 	}
+	if v := os.Getenv("GOCLAW_GATEWAY_AUTO_TITLE"); v != "" {
+		b := v == "true" || v == "1"
+		c.Gateway.AutoTitle = &b
+	}
 
 	// Database
 	envStr("GOCLAW_POSTGRES_DSN", &c.Database.PostgresDSN)

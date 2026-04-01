@@ -1,4 +1,4 @@
-import { Eye, MessageSquareText, Brain } from "lucide-react";
+import { Eye, MessageSquareText, Brain, Type } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { FeatureSwitchGroup } from "@/components/shared/feature-switch-group";
 import type { FeatureSwitchItem } from "@/components/shared/feature-switch-group";
@@ -6,6 +6,7 @@ import type { FeatureSwitchItem } from "@/components/shared/feature-switch-group
 interface UxValues {
   tool_status: boolean;
   block_reply: boolean;
+  auto_title: boolean;
   intent_classify: boolean;
 }
 
@@ -38,6 +39,16 @@ export function BehaviorUxCard({ value, onChange }: Props) {
       onCheckedChange: (v) => onChange({ ...value, block_reply: v }),
       infoWhenOn: t("behavior.blockReplyInfo"),
       infoClass: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300",
+    },
+    {
+      icon: Type,
+      iconClass: "text-purple-500",
+      label: t("gateway.autoTitle"),
+      hint: t("behavior.autoTitleHint"),
+      checked: value.auto_title !== false,
+      onCheckedChange: (v) => onChange({ ...value, auto_title: v }),
+      infoWhenOn: t("behavior.autoTitleInfo"),
+      infoClass: "border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-950/30 dark:text-purple-300",
     },
     {
       icon: Brain,

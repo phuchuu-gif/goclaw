@@ -29,6 +29,7 @@ export function BehaviorSection({ config, onPatch, saving }: Props) {
   const [ux, setUx] = useState({
     tool_status: gw.tool_status !== false,
     block_reply: gw.block_reply ?? false,
+    auto_title: gw.auto_title !== false,
     intent_classify: ag.intent_classify !== false,
   });
 
@@ -63,6 +64,7 @@ export function BehaviorSection({ config, onPatch, saving }: Props) {
     setUx({
       tool_status: gw.tool_status !== false,
       block_reply: gw.block_reply ?? false,
+      auto_title: gw.auto_title !== false,
       intent_classify: ag.intent_classify !== false,
     });
     setRate({
@@ -88,6 +90,7 @@ export function BehaviorSection({ config, onPatch, saving }: Props) {
         ...gw,
         tool_status: ux.tool_status,
         block_reply: ux.block_reply,
+        auto_title: ux.auto_title,
         max_message_chars: rate.max_message_chars,
         rate_limit_rpm: rate.rate_limit_rpm,
         inbound_debounce_ms: rate.inbound_debounce_ms,
