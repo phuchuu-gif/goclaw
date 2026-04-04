@@ -62,6 +62,8 @@ ARG ENABLE_PYTHON=false
 ARG ENABLE_NODE=false
 ARG ENABLE_FULL_SKILLS=false
 ARG ENABLE_CLAUDE_CLI=false
+ARG ENABLE_VNSTOCK_MCP=false
+ARG VNSTOCK_MCP_PKG_URL=https://github.com/phuchuu-gif/vnstock-agent/archive/af86db9.zip
 
 # Install ca-certificates + wget (healthcheck) + optional runtimes.
 # ENABLE_FULL_SKILLS=true pre-installs all skill deps (larger image, no on-demand install needed).
@@ -72,7 +74,7 @@ RUN set -eux; \
         apk add --no-cache docker-cli; \
     fi; \
     if [ "$ENABLE_FULL_SKILLS" = "true" ]; then \
-        apk add --no-cache python3 py3-pip nodejs npm pandoc github-cli poppler-utils bash; \
+        apk add --no-cache python3 py3-pip nodejs npm pandoc github-cli poppler-utils bash tzdata; \
         pip3 install --no-cache-dir --break-system-packages \
             pypdf openpyxl pandas python-pptx markitdown defusedxml lxml \
             pdfplumber pdf2image anthropic; \
@@ -80,7 +82,7 @@ RUN set -eux; \
         rm -rf /tmp/npm-cache /root/.cache /var/cache/apk/*; \
     else \
         if [ "$ENABLE_PYTHON" = "true" ]; then \
-            apk add --no-cache python3 py3-pip; \
+            apk add --no-cache python3 py3-pip tzdata; \
             pip3 install --no-cache-dir --break-system-packages "aiohttp<4.0.0" edge-tts; \
         fi; \
         if [ "$ENABLE_NODE" = "true" ] || [ "$ENABLE_CLAUDE_CLI" = "true" ]; then \
@@ -90,8 +92,12 @@ RUN set -eux; \
     if [ "$ENABLE_CLAUDE_CLI" = "true" ]; then \
         npm install -g --cache /tmp/npm-cache @anthropic-ai/claude-code; \
         rm -rf /tmp/npm-cache; \
+    fi; \
+    if [ "$ENABLE_VNSTOCK_MCP" = "true" ]; then \
+        command -v python3 >/dev/null 2>&1; \
+        python3 -m venv /opt/vnstock-mcp; \
+        /opt/vnstock-mcp/bin/pip install --no-cache-dir "$VNSTOCK_MCP_PKG_URL"; \
     fi
-
 # Non-root user
 RUN adduser -D -u 1000 -h /app goclaw
 WORKDIR /app
@@ -101,6 +107,7 @@ COPY --from=builder /out/goclaw /app/goclaw
 COPY --from=builder /out/pkg-helper /app/pkg-helper
 COPY --from=builder /src/migrations/ /app/migrations/
 COPY --from=builder /src/skills/ /app/bundled-skills/
+COPY --from=builder /src/scripts/bootstrap_vnstock_mcp.py /app/bootstrap_vnstock_mcp.py
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 
 # Fix Windows git clone issues:
@@ -119,7 +126,8 @@ RUN set -eux; \
     done
 
 RUN chmod +x /app/docker-entrypoint.sh && \
-    chmod 755 /app/pkg-helper && chown root:root /app/pkg-helper
+    chmod 755 /app/pkg-helper && chown root:root /app/pkg-helper && \
+    chmod 755 /app/bootstrap_vnstock_mcp.py
 
 # Create data directories.
 # .runtime has split ownership: root owns the dir (so pkg-helper can write apk-packages),
@@ -143,7 +151,8 @@ ENV GOCLAW_CONFIG=/app/config.json \
     GOCLAW_SKILLS_DIR=/app/skills \
     GOCLAW_MIGRATIONS_DIR=/app/migrations \
     GOCLAW_HOST=0.0.0.0 \
-    GOCLAW_PORT=18790
+    GOCLAW_PORT=18790 \
+    GOCLAW_VNSTOCK_AUTO_BOOTSTRAP=true
 
 # Entrypoint runs as root to install persisted packages and start pkg-helper,
 # then drops to goclaw user via su-exec before starting the app.

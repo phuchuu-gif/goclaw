@@ -122,7 +122,21 @@ case "${1:-serve}" in
           echo "Upgrade warning (may already be up-to-date)"
       fi
     fi
-    run_as_goclaw /app/goclaw
+    if [ "${ENABLE_VNSTOCK_MCP:-false}" = "true" ] && [ -x /app/bootstrap_vnstock_mcp.py ]; then
+      if command -v su-exec >/dev/null 2>&1 && [ "$(id -u)" = "0" ]; then
+        su-exec goclaw /app/goclaw &
+      else
+        /app/goclaw &
+      fi
+      APP_PID=$!
+      trap 'kill -TERM "$APP_PID" 2>/dev/null || true' TERM INT
+      # Idempotent bootstrap: create/update vnstock MCP server at startup.
+      echo "Bootstrapping vnstock MCP server..."
+      /app/bootstrap_vnstock_mcp.py || echo "Warning: vnstock MCP bootstrap failed (non-fatal)"
+      wait "$APP_PID"
+    else
+      run_as_goclaw /app/goclaw
+    fi
     ;;
   upgrade)
     shift

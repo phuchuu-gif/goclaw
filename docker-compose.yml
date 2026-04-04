@@ -33,6 +33,8 @@ services:
         ENABLE_EMBEDUI: "${ENABLE_EMBEDUI:-true}"  # set to false when using WITH_WEB_NGINX
         ENABLE_PYTHON: "${ENABLE_PYTHON:-true}"
         ENABLE_FULL_SKILLS: "${ENABLE_FULL_SKILLS:-false}"
+        ENABLE_VNSTOCK_MCP: "${ENABLE_VNSTOCK_MCP:-false}"
+        VNSTOCK_MCP_PKG_URL: "${VNSTOCK_MCP_PKG_URL:-https://github.com/phuchuu-gif/vnstock-agent/archive/af86db9.zip}"
         VERSION: "${GOCLAW_VERSION:-dev}"
     # Uncomment to test update UI: GOCLAW_VERSION=v1.0.0
     ports:
@@ -49,6 +51,7 @@ services:
       - GOCLAW_SKILLS_DIR=/app/data/skills
       # Debug
       - GOCLAW_TRACE_VERBOSE=${GOCLAW_TRACE_VERBOSE:-0}
+      - VNSTOCK_API_KEY=${VNSTOCK_API_KEY:-}
     volumes:
       - goclaw-data:/app/data
       - goclaw-workspace:/app/workspace
